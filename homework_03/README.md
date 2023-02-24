@@ -1,4 +1,5 @@
 ### Домашнее задание "Docker контейнер c веб-приложением"
+### docker run -it -p 8000:8000 app
 #### Задача:
 - скопируйте папку `homework_03` для этой домашки 
   (Памятка: https://github.com/OtusTeam/BasePython/tree/homeworks-new)
