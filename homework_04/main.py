@@ -12,14 +12,43 @@
   (используйте полученные из запроса данные, передайте их в функцию для добавления в БД)
 - закрытие соединения с БД
 """
+import asyncio
 
+from models import engine, Session, User, Post, Base
+from jsonplaceholder_requests import fetch_users_data, fetch_posts_data
+
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+async def load_users_data():
+    users_data = await fetch_users_data()
+    users = [
+        User(name=user["name"], username=user["username"], email=user["email"])
+        for user in users_data
+    ]
+    async with Session() as s:
+        s.add_all(users)
+        await s.commit()
+
+async def load_posts_data():
+    posts_data = await fetch_posts_data()
+    posts = [
+        Post(user_id=post["userId"], title=post["title"], body=post["body"])
+        for post in posts_data
+    ]
+    async with Session() as s:
+        s.add_all(posts)
+        await s.commit()
 
 async def async_main():
-    pass
+    await create_tables()
+    await asyncio.gather(load_users_data(), load_posts_data())
 
 
 def main():
-    pass
+    asyncio.run(async_main())
+    Session.close()
 
 
 if __name__ == "__main__":
